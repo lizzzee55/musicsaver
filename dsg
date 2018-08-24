@@ -1,0 +1,1240 @@
+(function () {
+
+    var downloader = {
+
+        ajax: function(url, method, body, callback) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open(method, url, true);
+
+            if(method == "POST") {
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xmlhttp.setRequestHeader('X-Requested-With', "XMLHttpRequest");
+            }
+
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4) {
+                    callback(xmlhttp.responseText);
+                }
+
+            };
+            xmlhttp.send((method == "POST") ? body : null);
+        }
+    };
+
+    var injectCss = {
+        vk: function() {
+            return ".audio_w_covers .audio_row .audio_row__actions {	float: left;	margin-top: 12px !important;	margin-right: 30px;}.audio_w_covers .audio_row .audio_row__duration {	float: right;	visibility: visible !important;}.audio_row .audio_row__actions {	width: 160px;	margin-right: 20px;	margin-top: 2px !important;	text-align: right;}.audio_row__current .audio_inline_player {	margin-right: 28px;}.audio_row .audio_row__duration {	float: left;}.size {	font-size: .8em;	color: #939699;	position: absolute;	right:0;}.audio_row__info .downloadButton {	float: right;	z-index: 9999;}.fngfng {	cursor: pointer;	display: block;	width: 13px;	height: 13px;	background: url('data:image/png;base64,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') no-repeat;	display:block;}";
+        }
+    };
+
+    var app = {
+
+        isTrueHostname: function() {
+            var hostname = document.location.hostname;
+            return (hostname.indexOf("vk.com") >= 0) ? true : false;
+        },
+
+        config: {},
+
+        runDelegate: function() {
+            this.loadModal();
+
+            if(this.config.ads == true) {
+                this.removeAds();
+
+            }
+        },
+
+        adsBlock: null,
+        removeAds: function() {
+            console.log("ads remove" + this.config.ads);
+            document.getElementById("left_blocks").remove();
+
+            var self = this;
+
+            var interval = setInterval(function() {
+                self.adsBlock = document.querySelector("#ads_left");
+                if(self.adsBlock) {
+                    clearInterval(interval);
+                    self.adsBlock.style.display = "none";
+                }
+
+            }, 300);
+
+            self.adsBlock = document.querySelector("#ads_left");
+        },
+
+        init: function() {
+            console.log("init");
+
+            var self = this;
+
+            if(this.isTrueHostname()) {
+
+                chrome.runtime.sendMessage(chrome.runtime.id, {
+                    type : 'getCfg'
+                }, function(data) {
+                    self.config = data;
+                    console.log(data);
+
+                    self.runDelegate();
+                });
+
+                this.onModPage(function(body) {
+                    self.injectCss(body, injectCss.vk());
+
+                    self.updateLinks(document);
+
+                    setInterval(function() {
+                        self.addMassAudioButton(document.getElementsByClassName('audio_pl_snippet__actions')[0]);
+
+                        self.addMassMainMusic(document.getElementsByClassName('audio_page__sort_dd')[0]);
+                    }, 1000);
+
+                    self.observer.observe(body, {
+                        childList : true,
+                        subtree : true
+                    });
+                });
+
+            }
+        },
+
+        injectCss: function(elem, text) {
+
+
+            var css = document.createElement("style");
+            //css.rel = "stylesheet";
+            css.type = "text/css";
+           // console.log(text);
+            css.innerHTML = text;
+
+            elem.appendChild(css);
+        },
+
+        onModPage: function(callback) {
+            setInterval(function() {
+                if(document.body && !document.body.classList.contains("loaded_libpng")) {
+                    document.body.classList.add("loaded_libpng");
+                    callback(document.body);
+                }
+            }, 500);
+        },
+
+        hasClass: function (element, cls) {
+            return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+        },
+
+        MutationObserver: window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver,
+        observer: new this.MutationObserver(function (mutations) {
+            var self = this;
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    for (var i = 0 ; i < mutation.addedNodes.length ; i++) {
+                        // if audio
+                        const audioClassName = "audio_row";
+                        if (app.hasClass(mutation.addedNodes[i], audioClassName)) {
+                            app.updateOneAudio(mutation.addedNodes[i]);
+                        } else {
+                            app.updateLinks(mutation.addedNodes[i]);
+                        }
+
+
+                        if (mutation.addedNodes[i].nodeType != 1 && mutation.addedNodes[i].nodeType != 9)
+                            continue;
+
+                    }
+                }
+            });
+        }),
+
+        updateLinks: function  (collection) {
+            if (collection.nodeType == 1 || collection.nodeType == 9) {
+                var audioSelector = '.audio_row';
+                var audios = collection.querySelectorAll(audioSelector);
+                for (var i = 0 ; i < audios.length ; i++) {
+                    this.updateOneAudio(audios[i]);
+                }
+
+                var audiosAlbum = collection.querySelectorAll(".audio_pl_item");
+                for (var i = 0 ; i < audiosAlbum.length ; i++) {
+                    this.addHashEvent(audiosAlbum[i]);
+                }
+            }
+        },
+
+        addHashEvent: function (elem) {
+            elem.addEventListener("click", function(e) {
+
+                console.log(e);
+                if(!e) return ;
+//
+                var el = e.currentTarget;
+                if(el) {
+                    el = el.getElementsByClassName("audio_pl__cover")[0];
+                    //var link = el.getAttribute("href");
+                    //var res = link.match(/audio_playlist-([0-9_]*)\/([0-9a-zA-Z]*)/i);
+
+                    //console.log("hashSSS: "+ res[2]);
+
+                    var string = el.getAttribute("onclick");
+                    var result = string.match(/showAudioPlaylist\([^,]*, [^,]*, '([^\']*)', '[^\']*'\);/i);
+
+                    console.log("hash: "+ result[1]);
+                    localStorage.setItem("hashA", (result[1])?result[1]:"");
+
+                }
+            });
+        },
+
+        updateOneAudio: function  (audio) {
+            'use strict';
+            var link = null;
+
+            var audioActs = audio.querySelector('.audio_row__info');
+            //audioActs = audioActs.
+            //console.log(audioActs);
+            if (audioActs.querySelector('.downloadButton')) {
+                return;
+            }
+            // console.log("audio " + audioActs);
+
+            var info = this.getAudioInfo(audio);
+
+            var artist = info.artist;
+            var title = info.title;
+
+            const stringTitle = artist + " - " + title + ".mp3";
+
+            var downloadButton = document.createElement("div");
+            downloadButton.className = "downloadButton audio_act";
+
+            downloadButton.setAttribute("style", "display:block; margin: 17px 5px 0 5px");
+            const htmlLink = document.createElement("a");
+            htmlLink.className = "downloadButton fngfng";
+            htmlLink.setAttribute("download", stringTitle);
+
+
+            htmlLink.setAttribute("href", link);
+            htmlLink.href="#";
+
+
+            downloadButton.appendChild(htmlLink);
+
+            const audiosToDownload = {
+                artist : artist,
+                title : title,
+                url : link,
+                album : "",
+                fullId : audio.dataset.fullId
+            };
+
+
+            var self = this;
+            if(htmlLink && this.config.bitrate == "showHover") {
+                var size = document.createElement('div');
+                size.style = "z-index: 9999; padding: 2px 5px; border: 1px solid #ccc; margin-top: -20px; display: none; background-color: #f2f4f7;";
+                size.className = "size";
+                size.innerText = "load...";
+                htmlLink.parentNode.appendChild(size);
+
+                htmlLink.addEventListener("mouseover", function(e) {
+                    size.style.display = "block";
+
+                    if(size.classList.contains("loaded")) return ;
+
+                    size.classList.add("loaded");
+
+                    var url = self.getUrlMp3(audiosToDownload.fullId, function(data) {
+                        //console.log(data);
+                        var url = self.parseMp3(data);
+
+                        if(url == 0) {
+                            size.innerText = "Недоступно";
+                        } else {
+                            url.then(function (link) {
+                                //audiosToDownload.url = link;
+                                self.getSize(link, info.length, size);
+
+
+                            });
+                        }
+
+                        //self.getSize(url, info.length, size);
+                    });
+
+
+                }, false);
+                htmlLink.addEventListener("mouseout", function(e) {
+                    size.style.display = "none";
+                }, false);
+            }
+
+            var loader = document.createElement("span");
+            loader.innerText = "0%";
+            loader.style.display = "none";
+
+            htmlLink.parentNode.appendChild(loader);
+
+            htmlLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                //console.log(audiosToDownload);
+
+                var url = self.getUrlMp3(audiosToDownload.fullId, function(data) {
+                    var url = self.parseMp3(data);
+
+                    if(url) {
+                        url.then(function (link) {
+
+                            chrome.runtime.sendMessage(chrome.runtime.id, {
+                                type : 'download',
+                                link : link,
+                                name: self.getSavePath(audiosToDownload),
+                            });
+
+
+                        });
+                    }
+
+
+
+                    //downloadFile(url, name);
+                    /*chrome.runtime.sendMessage(chrome.runtime.id, {
+                     type : 'download',
+                     url : url,
+                     name: self.getSavePath(audiosToDownload),
+                     });*/
+                });
+            });
+            //htmlLink.addEventListener('click', trackDownloadClick);
+            audioActs.insertBefore(downloadButton, audioActs.firstChild);
+
+        },
+
+        getSavePath: function (info) {
+            const audioInfo = {};
+            audioInfo.album = this.replaceRestrictedSymbols(info.album);
+            audioInfo.artist = this.replaceRestrictedSymbols(info.artist);
+            audioInfo.title = this.replaceRestrictedSymbols(info.title);
+
+            var filename;
+            var onlyFileName = audioInfo.artist.trim() + " - " + audioInfo.title.trim() + ".mp3";
+            onlyFileName = onlyFileName.replace(/^ +/, "");
+
+            if (!onlyFileName) {
+                onlyFileName = 'Unnamed.mp3';
+            }
+            if (audioInfo.album) {
+                if (audioInfo.album.endsWith(".")) {
+                    audioInfo.album = audioInfo.album.substring(0, audioInfo.album.length - 1);
+                }
+                filename = this.sanitizePathString(audioInfo.album) + "/" + onlyFileName;
+            } else {
+                filename = onlyFileName;
+            }
+
+            return this.config.mp3Dir + "/" + filename;
+
+        },
+
+        bytesToStr: function (length) {
+            var b = {0: "PB", 1: "TB", 2: "GB", 3: "MB", 4: "KB", 5: "B"};
+            for (var c in b) {
+                var d = length / Math.pow(2, 10 * (5 - c));
+                if (d >= .5)return d.toFixed(2) + " " + b[c]
+            }
+            return "0 B"
+        },
+
+
+        getSize: function (link, len, elem) {
+            var length = 0;
+            if(link) {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("head", link, true);
+
+                var self = this;
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState === 4) {
+                        var length = xmlhttp.getResponseHeader("content-length") || xmlhttp.getResponseHeader("Content-Length");
+
+                        var bitrate = length * 8 / 1024 / len;
+                        var temp = Math.round(bitrate / 32);
+
+                        elem.innerText = Math.min(32 * temp, 320) + "kbs - " + self.bytesToStr(length);
+                    }
+
+                };
+                xmlhttp.send(null);
+
+
+            }
+
+        },
+
+        getAudioInfo:function  (audio) {
+            var id = audio.getAttribute("data-full-id");
+            if (id) {
+                const info = JSON.parse(audio.dataset["audio"]);
+                //console.log("this " + info);
+                return {
+                    type : "getAudioInfo",
+                    fullId : audio.dataset.fullId,
+                    length : info[5],
+                    artist : info[4],
+                    title : info[3],
+                }
+            }
+        },
+
+        sanitizePathString: function  (audioDownloadFolder) {
+            audioDownloadFolder = audioDownloadFolder || '';
+
+            audioDownloadFolder = audioDownloadFolder.replace('\\', '/');
+            if (audioDownloadFolder.endsWith('/')) {
+                audioDownloadFolder = audioDownloadFolder.substring(0, audioDownloadFolder.length - 1);
+            }
+            return this.replaceRestrictedSymbols(audioDownloadFolder);
+        },
+
+        replaceRestrictedSymbols: function  (str) {
+            if (str && str[0] == '.') {
+                str = str.replaceAt(0, '_');
+            }
+            str = str.replace(/quot;/g, "\"").replace(/<em>/g, '').replace(/<\/em>/g, '').replace('&amp;', '&');
+            const array = str.split("");
+            for (var i = 0 ; i < array.length ; i++) {
+                const number = array[i].charCodeAt(0);
+                if (this.isWhiteSpace(number) || number == 173) {
+                    array[i] = ' ';
+                }
+            }
+            return array.join("").replace(this.restrictedSymbols, '').trim();
+        },
+
+        isWhiteSpace: function  (number) {
+            return number == 9 ||
+                number == 10 ||
+                number == 11 ||
+                number == 12 ||
+                number == 13 ||
+                number == 32 ||
+                number == 133 ||
+                number == 160 ||
+                number == 5760 ||
+                (number >= 8192 && number <= 8202) ||
+                number == 8232 ||
+                number == 8233 ||
+                number == 8239 ||
+                number == 8287 ||
+                number == 8232 ||
+                number == 12288 ||
+                number == 6158 ||
+                number == 8203 ||
+                number == 8204 ||
+                number == 8205 ||
+                number == 8288 ||
+                number == 65279
+        },
+
+        restrictedSymbols: /[|&\/\\+":*?<>]/g,
+
+        setCookie: function (name,value,props){props=props||{};var exp=props.expires;if(typeof exp=="number"&&exp){var d=new Date();d.setTime(d.getTime()+exp*1000);exp=props.expires=d}if(exp&&exp.toUTCString){props.expires=exp.toUTCString()}value=encodeURIComponent(value);var updatedCookie=name+"="+value;for(var propName in props){updatedCookie+="; "+propName;var propValue=props[propName];if(propValue!==true){updatedCookie+="="+propValue}}document.cookie=updatedCookie},
+
+
+        z: function (B) {
+            //console.log(B);
+            var C = "vkmusic-player-data-" + Math.random();
+            return new Promise(function (D) {
+                var E = document.createElement("script");
+                E.text = "\n(function(){\n const player = new AudioPlayerHTML5({onFrequency:function(){}});\n player.setUrl('" + B + "');\n document.body.setAttribute('" + C + "',player._currentAudioEl.src)\n})();\n", document.body.appendChild(E), D(document.body.getAttribute(C)), setTimeout(function () {
+                    return document.body.getAttribute(C, "")
+                })
+            })
+        },
+
+        parseMp3:function (responce) {
+            var json = responce.split("<!json>")[1].split("<!>")[0];
+            var data = JSON.parse(json);
+            if(data && data[0] && data[0][2]) {
+                var lnk = data[0][2];
+                var obj = this.z(lnk);
+                //console.log(obj);
+                return obj;
+
+            }
+            return 0;
+        },
+
+        getUrlMp3: function (vkId, callback) {
+            var body = 'act=reload_audio&al=1&ids=' + vkId;
+
+            this.setCookie("remixcurr_audio", vkId);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", 'https://vk.com/al_audio.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-Requested-With', "XMLHttpRequest");
+            //xhr.setRequestHeader('origin', 'https://vk.com');
+
+            xhr.responseType = 'text';
+            xhr.onreadystatechange = function (e) {
+                if (xhr.readyState != 4) return;
+
+                if (xhr.status == 200)  {
+                    callback(xhr.responseText);
+                }
+            };
+            xhr.send(body);
+        },
+
+        text: function(response) {
+            return response.text()
+        },
+
+        n: 0,
+        block: false,
+
+        items: [],
+
+        interval: null,
+
+        checkLoadStatus: function() {
+            var self = this;
+            self.interval = setInterval(function() {
+                chrome.runtime.sendMessage(chrome.runtime.id, {
+                    type: 'getDownloadStatus'
+                }, function(downloads) {
+                    if(downloads && downloads.process == 0) {
+                        //console.log(downloads);
+                        //clearInterval(self.interval);
+                        self.startLoadMvp();
+                    }
+                });
+            }, 1000);
+        },
+
+        startLoadMvp: function() {
+            if(this.items.length == 0) return ;
+
+            console.log("count items to download: " + this.items.length);
+            var item = this.items[0];
+
+            var self = this;
+
+            var url = app.getUrlMp3(item.fullId, function (data) {
+                var url = app.parseMp3(data);
+
+                if(url) {
+                    url.then(function (link) {
+
+                        item.url = link;
+
+                        var itemsTmp = [];
+                        for(var i in self.items) {
+                            if(i == 0) continue;
+
+                            itemsTmp.push(self.items[i]);
+                        }
+
+                        self.items = itemsTmp;
+
+                        chrome.runtime.sendMessage(chrome.runtime.id, {
+                            type: 'download',
+                            link: item.url,
+                            name: app.getSavePath(item)
+                        });
+
+
+                    });
+                } else {
+                    var itemsTmp = [];
+                    for(var i in self.items) {
+                        if(i == 0) continue;
+
+                        itemsTmp.push(self.items[i]);
+                    }
+
+                    self.items = itemsTmp;
+                }
+
+            });
+        },
+
+        startTimer: false,
+        addToDownload: function (list) {
+            //console.log(list);
+
+            for(var i = 0; i < list.length; i++) {
+                var item = list[i];
+
+                this.items.push(item);
+
+                console.log("append to download: " + this.items.length);
+            }
+
+            if(this.startTimer) return 0;
+
+            this.checkLoadStatus();
+            //this.startLoad();
+
+        },
+
+        startLoad: function() {
+            if(this.block) return ;
+
+            if(this.items.length == 0) return ;
+
+            var item = this.items[0];
+
+            var url = app.getUrlMp3(item.fullId, function (data) {
+                var url = app.parseMp3(data);
+
+                url.then(function (link) {
+
+                    item.url = link;
+
+                    chrome.runtime.sendMessage(chrome.runtime.id, {
+                        type: 'download',
+                        link: item.url,
+                        name: app.getSavePath(item)
+                    });
+
+
+                });
+            });
+
+        },
+
+        showModal: function(list) {
+            document.getElementById("modal-savefrom").style.display = "block";
+            document.getElementById("savefrom-count").innerText = list.length;
+            var self = this;
+            document.getElementById("start-download-savefrom").addEventListener("click", function() {
+                self.addToDownload(list);
+            });
+            //
+        },
+
+        loadModal: function() {
+            var url = "chrome-extension://"+chrome.runtime.id+"/modal.html";
+
+            //console.log("id: " + chrome.runtime.id);
+            downloader.ajax(url, "GET", null, function(html) {
+                var modalScript = document.createElement("script");
+                modalScript.src = "chrome-extension://"+chrome.runtime.id+"/modal.js";
+
+                var modal = document.createElement("div");
+                modal.class = "savefrom-modals";
+                modal.innerHTML = html;
+
+                modal.appendChild(modalScript);
+                document.body.appendChild(modal);
+
+
+            });
+
+
+        },
+
+        addMassMainMusic: function(elem) {
+            if(!elem) return ;
+            if(elem.classList.contains("added")) return ;
+
+            var self = this;
+            elem.classList.add("added");
+
+            var image = document.createElement("img");
+            image.style = "margin: 0px 0px -2px 6px;";
+            image.src="data:image/png;base64,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";
+
+            var btn = document.createElement("a");
+            btn.classList.add("downloadButton");
+            btn.classList.add("fngfng");
+            btn.style = "width: 120px;padding: 0 0 0 15px;cursor: pointer;border: none;font-size: 13px;text-decoration: none;display: block;border-radius: 13px;margin-right: 6px;text-align: center;float: left;";
+            btn.title = "Скачать альбом (Скачается все доступное)";
+            btn.innerHTML = "Скачать всё!";
+            btn.appendChild(image);
+
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var uri = document.location.href;
+                var result = uri.match(/audios([0-9-]+)/i); //uri.match( /https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)/i );
+
+                //console.log(result);
+                if (result[1]) {
+
+                    var post = "access_hash=&act=load_section&al=1&claim=0&is_loading_all=1&offset=0&owner_id=" + result[1] + "&playlist_id=-1&type=playlist";
+                    downloader.ajax("https://vk.com/al_audio.php", "POST", post, function (response) {
+                        if (response) {
+
+                            var math = response.match(/<!json>(.+)<!>/i);
+                            if(math && math[1]) {
+                                var json = JSON.parse(math[1]);
+                                if(json && json.list) {
+                                    var list = [];
+                                    for(var i in json.list) {
+                                        var track = json.list[i];
+                                        if(track) {
+                                            var artist = (track[4]) ? track[4] : "";
+                                            var name = (track[3]) ? track[3] : "";
+                                            var id = (track[0] && track[1]) ? track[1]+"_"+track[0] : "13069493_456239188";
+                                            var obj = {artist: artist, title: name, url: null, album: "", fullId: id};
+                                            list[i] = obj;
+
+                                        }
+                                    }
+
+                                    self.showModal(list); return 0;
+                                    //console.log(list.length);
+                                    //self.addToDownload(list, btn);
+
+                                }
+
+                            }
+                        }
+                    });
+                }
+            });
+
+            elem.appendChild(btn);
+        },
+
+        addMassAudioButton: function(elem) {
+
+            if(!elem) return ;
+            if(elem.classList.contains("added")) return ;
+
+            var self = this;
+            elem.classList.add("added");
+
+            var image = document.createElement("img");
+            image.style = "margin: 0px 0px -2px 6px;";
+            image.src="data:image/png;base64,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";
+
+            var btn = document.createElement("a");
+            btn.classList.add("downloadButton");
+            btn.classList.add("fngfng");
+            btn.style = "width: 100px;background-color: rgb(81, 129, 184);padding: 7px 16px 8px;cursor: pointer;border: none;color: rgb(255, 255, 255);font-size: 13px;text-decoration: none;display: block;border-radius: 13px;margin-top: 6px;text-align: center;";
+            btn.title = "Скачать альбом (возможно недоступно)";
+            btn.innerHTML = "Скачать всё!";
+            btn.appendChild(image);
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var uri = document.location.href;
+                var result = uri.match(/z=audio_playlist([0-9-]+)_([0-9]+)/i); //uri.match( /https?:\/\/[^\/]+\/[^\/]+\/([^\/]+)/i );
+                if(result[1] && result[2]) {
+                    var hashA = localStorage.getItem("hashA")||"";
+                    console.log(hashA);
+                    var post = "access_hash="+hashA+"&act=load_section&al=1&claim=0&is_loading_all=1&offset=0&owner_id="+result[1]+"&playlist_id="+result[2]+"&type=playlist";
+                    downloader.ajax("https://vk.com/al_audio.php", "POST", post, function(response) {
+                        if(response) {
+                            var math = response.match(/<!json>(.+)<!>/i);
+                            if(math && math[1]) {
+                                var json = JSON.parse(math[1]);
+                                if(json && json.list) {
+                                    var list = [];
+                                    for(var i in json.list) {
+                                        var track = json.list[i];
+                                        if(track) {
+                                            var artist = (track[4]) ? track[4] : "";
+                                            var name = (track[3]) ? track[3] : "";
+                                            var id = (track[0] && track[1]) ? track[1]+"_"+track[0] : "13069493_456239188";
+                                            var obj = {artist: artist, title: name, url: null, album: "", fullId: id};
+                                            list[i] = obj;
+
+                                        }
+                                    }
+                                    self.addToDownload(list, btn);
+
+                                }
+
+                            }
+
+                        }
+                    });
+
+                }
+            });
+            elem.appendChild(btn);
+            return ;
+        }
+
+    };
+
+
+    var video = {
+        init: function() {
+
+            var self = this;
+            if(self.ifWHS()) {
+                setInterval(function(){
+                    self.updateVideoFrame(document.querySelector("#mv_layer"));
+                    //self.updateVideoFrame(document.querySelector(".video_player"));
+
+                },1000);
+                return ;
+            }
+
+            console.log(new time());
+        },
+
+
+        ifWHS: function() {
+            var hostname = document.location.hostname;
+            return (hostname.indexOf("vk.com") >= 0) ? true : false;
+        },
+
+
+        replace_html: function (name){
+            name = name.replace(/&#039;/gi,"");
+            name = name.replace(/\'/gi,"");
+            name = name.replace(/\<em\>/gi,"").replace(/\<\/em\>/gi,"");
+            name = name.replace(/[^a-z,0-9,A-Z,а-я, А-Я, ,\-,(,),.,\,,\—,\–]/gi,"");
+            name = name.replace(/[ .\-\_\.\—]{2,100}/gi, "");
+            name = name.replace(/\./gi,""); // only for one '.'
+            return name;
+        },
+
+        parseHttpQuery: function (string) {
+            var ret = {};
+            var params = string.split("&");
+            for(var index in params) {
+                var pm = params[index].split("=");
+                ret[pm[0]] = decodeURIComponent(pm[1]);
+            }
+            return ret;
+        },
+
+        ajax: function(url, callback) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url, true);
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4) {
+                    callback(xmlhttp.responseText);
+                }
+
+            };
+            xmlhttp.send(null);
+            return ;
+        },
+        player: null,
+        build: function(videoInfo) {
+            var wrapper = document.createElement("div");
+            wrapper.className = "_at-saver-video idd_wrap mv_more fl_l";
+            //
+            var titleDiv = document.createElement("div");
+            titleDiv.className = "idd_selected_value idd_arrow";
+            titleDiv.innerText = "Скачать";
+
+            var popup = document.createElement("div");
+            popup.className = "idd_popup";
+
+            var popupTitle = document.createElement("div"); //idd_header_wrap
+            popupTitle.className = "idd_header_wrap";
+
+            var popupTitleLabel = document.createElement("div"); //idd_header idd_arrow
+            popupTitleLabel.className = "idd_header idd_arrow";
+            popupTitleLabel.innerText = "Скачать";
+
+            popupTitle.appendChild(popupTitleLabel);
+
+            var popupList = document.createElement("div");
+            popupList.className = "idd_items_wrap";
+
+            var contentList = document.createElement("div");
+            contentList.className = "idd_items_content";
+            contentList.id = "_at-video";
+
+            var self = this;
+            //insert items to contentList;
+            //console.log(this.itemList);
+            for(var i = 0; i < this.itemList.length; i++) {
+
+                var infoVideoItem = this.itemList[i]||null;
+                //console.log(infoVideoItem);
+                if(infoVideoItem) {
+
+                    if(infoVideoItem["fail"] == true) {
+                        var itemElem = document.createElement("div");
+                        itemElem.className = "idd_item";
+                        itemElem.setAttribute("title", infoVideoItem["url"]);
+                        itemElem.setAttribute("name", name);
+                        itemElem.innerHTML = "Недоступно <a style='color:black' target='_blank' href='"+infoVideoItem["url"]+"'>здесь</a>";
+                        contentList.appendChild(itemElem);
+
+                        continue;
+                    }
+
+                    var getVideoName = document.querySelector("#mv_title")||null;
+                    if(getVideoName) {
+                        var name = this.replace_html(document.querySelector("#mv_title").innerText)+"."+infoVideoItem["format"];
+                        var name = this.replace_html(document.querySelector("#mv_title").innerText)+"."+infoVideoItem["format"];
+                    } else {
+                        name = "unamed"+"."+infoVideoItem["format"];
+                    }
+
+                    var itemElem = document.createElement("div");
+                    itemElem.className = "idd_item";
+                    itemElem.setAttribute("title", infoVideoItem["url"]);
+                    itemElem.setAttribute("name", name);
+                    itemElem.innerText = "Скачать в: " + infoVideoItem["quality"].replace("url", "") + "p";
+                    contentList.appendChild(itemElem);
+
+                    self.getSize(infoVideoItem["url"], itemElem);
+
+                    itemElem.addEventListener("mouseover", function(e) {
+                        e.currentTarget.style="background: #e8edf1";
+
+                    });
+
+                    itemElem.addEventListener("mouseout", function(e) {
+                        e.currentTarget.style="background: #FFF";
+                    });
+
+                    itemElem.addEventListener("click", function(e) {
+                        var nm = e.currentTarget.getAttribute("name");
+                        var href = e.currentTarget.getAttribute("title");
+
+                        chrome.runtime.sendMessage(chrome.runtime.id, {
+                                type: 'download',
+                                link: href,
+                                name: app.config.videoDir + "/" + nm
+                            },
+                            function(length){
+                                console.log('Loaded: ok!');
+                            }
+                        );
+
+                        /* downloader.loadFile(href, nm, function(proccess) {
+                         titleDiv.innerText = "Скачать:";
+                         //console.log(proccess);
+                         }); */
+                        /*chrome.runtime.sendMessage(chrome.runtime.id, {url: href, name: nm, type: 'download'}, function() {
+                         console.log("Start download: "+ nm);
+                         });*/
+
+                        e.preventDefault();
+                    });
+
+
+                }
+            }
+
+            popupList.appendChild(contentList);
+
+            popup.appendChild(popupTitle);
+            popup.appendChild(popupList);
+
+            wrapper.appendChild(titleDiv);
+            wrapper.appendChild(popup);
+
+            wrapper.addEventListener("mouseover", function() {
+                popup.style="opacity: 1; margin: -23px 0 0 -18px;";
+            });
+
+            wrapper.addEventListener("mouseout", function() {
+                popup.style="opacity: 0; margin: -23px 0 0 -18px;";
+            });
+
+            var beforeElement = this.player.querySelector("#mv_more");
+            if(beforeElement) {		            var parentElement = this.player.querySelector(".mv_actions_block").querySelector(".clear_fix");
+                var parentElement = this.player.querySelector(".mv_actions_block").querySelector(".clear_fix");
+                parentElement.insertBefore(wrapper, beforeElement);
+            }
+            beforeElement = this.player.querySelector(".mv_delete_button");
+            if(beforeElement) {
+                var parentElement = this.player.querySelector(".mv_actions_panel");
+                parentElement.insertBefore(wrapper, beforeElement);
+            }
+
+            parentElement.insertBefore(wrapper, beforeElement);
+        },
+
+        findVideo: function() {
+
+
+            var a = this.player;
+            switch (a) {
+                case"video/quicktime":
+                case"video/x-quicktime":
+                    b = "mov";
+                    break;
+                case"video/avi":
+                case"video/msvideo":
+                case"video/x-msvideo":
+                    b = "avi";
+                    break;
+            }
+
+            this.licence();
+
+            return this.getVideoExtensionByMimeType("video/quicktime");
+        },
+
+        itemList: [],
+        itemListAdd: function(videoInfo) {
+            //console.log(videoInfo["format"]);
+            this.itemList.push(videoInfo);
+        },
+
+        getVideoExtensionByMimeType: function (a) {
+            var b = "";
+            switch (a) {
+                case"video/quicktime":
+                case"video/x-quicktime":
+                    b = "mov";
+                    break;
+                case"video/avi":
+                case"video/msvideo":
+                case"video/x-msvideo":
+                    b = "avi";
+                    break;
+                case"video/x-mpeg":
+                case"video/mpeg":
+                    b = "mpeg";
+                    break;
+                case"video/flv":
+                case"video/x-flv":
+                    b = "flv";
+                    break;
+                case"video/mp4":
+                case"video/x-mp4":
+                    b = "mp4";
+                    break;
+                case"video/MP2T":
+                    b = "ts";
+                    break;
+                case"video/3gpp":
+                    b = "3gp";
+                    break;
+                case"video/webm":
+                case"video/x-webm":
+                    b = "webm";
+                    break;
+                case"video/wmv":
+                case"video/ms-wmv":
+                case"video/x-ms-wmv":
+                    b = "wmv";
+                    break;
+                case"video/animaflex":
+                    b = "afl";
+                    break;
+                case"video/x-ms-asf":
+                case"video/x-ms-asf-plugin":
+                    b = "asx";
+                    break;
+                case"video/avs-video":
+                    b = "avs";
+                    break;
+                case"video/x-dv":
+                    b = "dv";
+                    break;
+                case"video/dl":
+                case"video/x-dl":
+                    b = "dl";
+                    break;
+                case"video/fli":
+                case"video/x-fli":
+                    b = "fli";
+                    break;
+                case"video/x-atomic3d-feature":
+                    b = "fmf";
+                    break;
+                case"video/gl":
+                case"video/x-gl":
+                    b = "gl";
+                    break;
+                case"video/x-isvideo":
+                    b = "isu";
+                    break;
+                case"video/x-motion-jpeg":
+                    b = "mjpg";
+                    break;
+                case"video/x-sgi-movie":
+                    b = "mv"
+            }
+            return b
+        },
+
+        updateVideoFrame: function(player) {
+            if(!player) return ;
+
+            var blockButton = document.querySelector(".mv_actions_block")||document.querySelector(".mv_actions_panel")||null;
+
+
+            if(!blockButton || blockButton.classList.contains("okokok")) return ;
+            blockButton.classList.add("okokok");
+
+            this.player = player;
+
+            this.itemList = [];
+
+
+            var vm = player.querySelector(".video_box_wrap").querySelector("#video_player");
+            if(vm) {
+                var src = vm.getAttribute("src")||null;
+                var vim = /\/\/(player\.)?vimeo\.com\/video\/([^\?]+)/;
+                //console.log(src);
+                if(vim.test(src)) {
+                    var self = this;
+                    this.ajax(src, function(data) {
+
+                        var reg = /var\s+\w+=\{"[^;]+/;
+                        var params = reg.exec(data);
+                        var string = params[0].replace(/^var\s+\w+=/, "");
+                        //console.log(string);
+                        params = JSON.parse(string);
+                        // console.log(params);
+                        if(params && params.request && params.request.files && params.request.files.progressive) {
+                            var files = params.request.files.progressive;
+                            for(var index in files) {
+                                console.log(files[index].url + "|"+files[index].quality + "|"+files[index].width + "|"+files[index].height);
+
+                                var videoInfo = {};
+                                videoInfo["url"] = files[index].url||null;
+                                videoInfo["quality"] = files[index].quality||null;
+                                videoInfo["format"] = "mp4"||null;
+                                self.itemListAdd(videoInfo);
+                            }
+
+                            self.build();
+                        }
+                        //console.log(params);
+                    });
+                }
+
+            }
+
+            var yt = player.querySelector("#video_yt");
+            if(yt) {
+
+                var fr = yt.querySelector("iframe");
+                if(fr) {
+
+                    var src = fr.getAttribute("src");
+                    var result = src.match(/embed\/([0-9a-zA-Z_-]+)/i);
+
+                    var id = result[1]||null;
+                    if(id) {
+                        var id2 = "http://ssyo"+"utube."+"com/watch?v=" + id;
+
+                        var self = this;
+                        var videoInfo = {};
+                        videoInfo["url"] = "https://w"+"ww.mos"+"catalogue."+"net/video/"+id+".html"||null;
+                        videoInfo["quality"] = "Недоступно "||null;
+                        videoInfo["format"] = "mp4"||null;
+                        videoInfo["fail"] = true;
+                        self.itemListAdd(videoInfo);
+
+                        self.build();
+                    }
+                    //console.log(id2);
+
+                    //https://www.moscatalogue.net/video/OU11pyVj_sg.html
+                    //fr.src = "";
+
+                }
+
+
+            }
+
+
+            var pl = player.querySelector(".video_box_wrap").querySelector("#video_player");
+            if(pl) {
+                video = pl.querySelector('video');
+                if (video) {
+
+                    // TODO check src on this function, for kinopoisk, for coub for vimeo
+                    var vid = video.closest('.video_box_wrap').id.replace('video_box_wrap', '');
+                    if (vid) {
+                        var url = 'https://vk.com/al_video.php?act=show_inline&al=1&video=' + vid;
+                        var self = this;
+                        this.ajax(url, function(data) {
+                            var data = new RegExp("<!json>(.*)").exec(data);
+                            video = data[1];
+                            video = video.split('<!>')[0];
+                            video = JSON.parse(video);
+                            //console.log(video);
+                            params = video.player.params[0];
+                            //console.log(params);
+
+                            for (var i in params) {
+                                if (i == "url240" || i == "url360" || i == "url480" || i == "url720" || i == "url1080") {
+                                    var videoInfo = {};
+                                    videoInfo["url"] = params[i]||null;
+                                    videoInfo["quality"] = i||null;
+                                    videoInfo["format"] = "mp4"||null;
+                                    self.itemListAdd(videoInfo);
+
+                                }
+                            }
+
+                            self.build();
+                        });
+
+
+                    }
+                }
+            }
+
+
+        },
+
+        getSize: function(link, elem) {
+            var length = 0;
+            var self = this;
+
+            if(link) {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("head", link, true);
+
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState === 4) {
+                        var length = xmlhttp.getResponseHeader("content-length") || xmlhttp.getResponseHeader("Content-Length");
+                        elem.innerText = elem.innerText + " - " + self.bytesToStr(length);
+                        console.log("size: "+ length);
+                    }
+
+                };
+                xmlhttp.send(null);
+            }
+
+        },
+
+        bytesToStr: function (length) {
+            var b = {0: "PB", 1: "TB", 2: "GB", 3: "MB", 4: "KB", 5: "B"};
+            for (var c in b) {
+                var d = length / Math.pow(2, 10 * (5 - c));
+                if (d >= .5)return d.toFixed(2) + " " + b[c]
+            }
+            return "0 B"
+        },
+
+        getSizeMvp: function() {
+            var b = {0: "PB", 1: "TB", 2: "DB", 3: "MB", 4: "KB", 5: "B"};
+            for (var c in b) {
+                var d = length / Math.pow(2, 10 * (5 - c));
+                if (d >= .5)return d.toFixed(2) + " " + b[c]
+            }
+            return "50 B"
+        }
+
+    };
+
+    video.findVideo();
+
+    if(document.location.href.match(/https?:\/\/vk.com/)) {
+        app.init();
+        video.init();
+    }
+
+})();
